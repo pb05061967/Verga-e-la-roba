@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giovanni Verga - La Roba & Mastro-don Gesualdo | Laboratorio Multi-Nodo</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-amber: #b45309;
+            --accent-gold: #d97706;
+            --bg-warm: #fdfbf7;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --verga-brown: #451a03;
+        }
+
+        body {
+            background-color: var(--bg-warm);
+            color: var(--text-dark);
+            font-family: 'Merriweather', serif;
+            line-height: 1.8;
+        }
+
+        h1, h2, h3, h4, h5, .navbar-brand, .nav-tabs, .btn-node {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--verga-brown);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .hero-header {
+            background: linear-gradient(135deg, #281205 0%, #572408 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-bottom: 5px solid var(--accent-gold);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            padding: 35px;
+            margin-bottom: 45px;
+            border-left: 6px solid var(--primary-amber);
+        }
+
+        .text-box {
+            background-color: #faf6f0;
+            border: 1px solid #e2d8ce;
+            border-radius: 10px;
+            padding: 25px;
+            font-size: 1.05rem;
+            text-align: justify;
+            max-height: 550px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .text-box p {
+            margin-bottom: 1.2rem;
+            text-indent: 1.2rem;
+        }
+
+        /* Flashcards Flip */
+        .flashcard-container {
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 190px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            position: relative;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .flashcard-front {
+            background-color: #ffffff;
+            border: 2px solid var(--primary-amber);
+            color: var(--primary-amber);
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+        .flashcard-back {
+            background-color: var(--primary-amber);
+            color: #ffffff;
+            transform: rotateY(180deg);
+            font-size: 0.95rem;
+        }
+
+        /* Multi-Node System */
+        .node-container {
+            background: linear-gradient(135deg, #1c1917 0%, #292524 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 35px;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .node-badge {
+            background-color: var(--accent-gold);
+            color: #000;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .btn-node {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(217, 119, 6, 0.5);
+            color: #f1f5f9;
+            padding: 12px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-node:hover {
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: bold;
+            transform: translateX(5px);
+        }
+
+        .node-history-badge {
+            background: #44403c;
+            color: #d6d3d1;
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="#"><i class="fas fa-boxes-stacked me-2"></i>Verga: Il Culto della Roba</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto font-sans">
+                    <li class="nav-item"><a class="nav-link" href="#sezione-testi">Testi Integrali & Sintesi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#flashcards-section">Flashcards & Concetti</a></li>
+                    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="#nodo-interattivo"><i class="fas fa-sitemap me-1"></i>Percorso Comparativo (Multi-Nodo)</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Hero -->
+    <header class="hero-header">
+        <div class="container">
+            <h1 class="hero-title">La Roba e Mastro-don Gesualdo</h1>
+            <p class="lead fs-4 font-sans">Giovanni Verga – <em>Novelle Rusticane (1883) & Mastro-don Gesualdo (1889)</em></p>
+            <p class="fst-italic text-warning opacity-90 fs-5">"Roba mia, vientene con me!"</p>
+        </div>
+    </header>
+
+    <div class="container my-5">
+
+        <!-- 1. SEZIONE TESTI INTEGRALI E SINTESI -->
+        <section id="sezione-testi" class="section-card">
+            <h2 class="text-warning mb-4"><i class="fas fa-book-reader me-2"></i>Lettura dei Testi Integrali e Sintesi Tematica</h2>
+            
+            <ul class="nav nav-tabs mb-4" id="textTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active fs-5" id="roba-full-tab" data-bs-toggle="tab" data-bs-target="#roba-full" type="button">
+                        <i class="fas fa-file-lines me-2"></i>"La roba" (Integrale)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fs-5" id="gesualdo-full-tab" data-bs-toggle="tab" data-bs-target="#gesualdo-full" type="button">
+                        <i class="fas fa-file-lines me-2"></i>"Gesualdo: L'addio" (Integrale)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fs-5" id="sintesi-tab" data-bs-toggle="tab" data-bs-target="#sintesi" type="button">
+                        <i class="fas fa-compress-alt me-2"></i>Sintesi per Punti
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- TESTO INTEGRALE LA ROBA -->
+                <div class="tab-pane fade show active" id="roba-full">
+                    <div class="alert alert-success border-0 shadow-sm mb-3">
+                        <i class="fas fa-check-circle me-2"></i><strong>Testo Integrale Originale:</strong> La novella "La roba" da <em>Novelle rusticane</em> (1883).
+                    </div>
+                    <div class="text-box">
+                        <p>Il viandante che andava lungo il Biviere di Lentini, steso là come un pezzo di mare morto, e le stoppie riarse della Piana di Catania, e gli aranci sempre verdi di Francofonte, e i sugheri grigi di Resecone, e i pascoli deserti di Passaneto e di Passinatello, se domandava, per ingannare la noia della lunga strada polverosa, sotto il cielo fosco dal caldo, nell'ora in cui i campanelli della lettiga suonano tristemente nell'immensa campagna e i muli lasciano ciondolare il capo e la coda, e il lettighiere canta la sua canzone malinconica per non lasciarsi vincere dal sonno della malaria: «Qui di chi è?», sentiva rispondersi: «Di Mazzarò». E passando vicino a una fattoria grande quanto un paese, coi magazzini che sembrano chiese, e le galline a stormi accoccolate all'ombra del pozzo, e le donne che si mettevano la mano sugli occhi per vedere chi passava: «E qui?» «Di Mazzarò». E cammina e cammina, mentre la malaria vi pesava sugli occhi, e vi scuoteva all'improvviso l'abbaiare di un cane, passando per una vigna che non finiva più, e si allargava sul colle e sul piano, immobile, come gli pesasse addosso la polvere, e il guardiano sdraiato bocconi sullo schioppo, accanto al vallone, levava il capo sonnacchioso e apriva un occhio per vedere chi fosse: «E qui?» «Di Mazzarò».</p>
+<p>Poi veniva un uliveto folto come un bosco, dove l'erba non spuntava mai, e la raccolta durava fino a marzo. Erano gli ulivi di Mazzarò. E verso sera, allorché il sole tramontava rosso come il fuoco, e la campagna si velava di tristezza, si incontravano le lunghe file degli aratri di Mazzarò che tornavano, adagio adagio, dal maggese, e i buoi passavano il guado lentamente, col muso nell'acqua scura; e si vedevano nei pascoli lontani della Canziria, sulla pendice brulla, le immense macchie biancastre delle mandre di Mazzarò; e si udiva il fischio del pastore echeggiare nelle gole, e il campanaccio che risuonava ora sì ed ora no, e il canto solitario perduto nella valle. «Tutta roba di Mazzarò». Pareva che fosse di Mazzarò perfino il sole che tramontava e le cicale che ronzavano, e gli uccelli che andavano a rannicchiarsi col volo breve dietro le zolle, e il sibilo dell'assiolo nel bosco. Pareva che Mazzarò fosse disteso tutto grande per quanto era grande la terra, e che gli si camminasse sulla pancia. Invece egli era un omicciattolo, diceva il lettighiere, che non gli avreste dato un baiocco, a vederlo; e di grasso non aveva altro che la pancia, e non si sapeva come facesse a riempirla, perché non mangiava altro che due soldi di pane; e sì ch'era ricco come un maiale; ma aveva la testa ch'era un brillante, quell'uomo.</p>
+<p>Infatti, colla testa come un brillante, aveva accumulato tutta quella roba, dove prima veniva da mattina a sera a zappare, a potare, a mietere; col sole, coll'acqua, col vento; senza scarpe ai piedi, e senza uno straccio di cappotto; che tutti si rammentavano di avergli dato dei calci nel di dietro, quelli che ora gli davano dell'eccellenza, e gli parlavano col berretto in mano. Né per questo egli era montato in superbia, adesso che tutte le eccellenze del paese erano suoi debitori; e diceva che eccellenza vuol dire povero diavolo e cattivo pagatore; ma egli portava ancora il berretto, soltanto lo portava di seta nera, era la sua sola grandezza, e da ultimo era anche arrivato a mettere il cappello di feltro, perché costava meno del berretto di seta. Della roba ne possedeva fin dove arrivava la vista, ed egli aveva la vista lunga; dappertutto, a destra e a sinistra, davanti e di dietro, nel monte e nella pianura. Più di cinquemila bocche, senza contare gli uccelli del cielo e gli animali della terra, che mangiavano sulla sua terra, e senza contare la sua bocca la quale mangiava meno di tutte, e si contentava di due soldi di pane e un pezzo di formaggio, ingozzato in fretta e in furia, all'impiedi, in un cantuccio del magazzino grande come una chiesa, in mezzo alla polvere del grano, che non ci si vedeva, mentre i contadini scaricavano i sacchi, o a ridosso di un pagliaio, quando il vento spazzava la campagna gelata, al tempo del seminare, o colla testa dentro un corbello, nelle calde giornate della mèsse. Egli non beveva vino, non fumava, non usava tabacco, e sì che del tabacco ne producevano i suoi orti lungo il fiume, colle foglie larghe ed alte come un fanciullo, di quelle che si vendevano a 95 lire. Non aveva il vizio del giuoco, né altri vizi. Di donne non aveva mai avuto sulle spalle che sua madre, la quale gli era costata anche dodici tarì, quando aveva dovuto farla portare al camposanto.</p>
+<p>Era che ci aveva pensato e ripensato tanto a quel che vuol dire la roba, quando andava senza scarpe a lavorare nella terra che adesso era sua, ed aveva provato quel che ci vuole a fare i tre tarì alla giornata, nel mese di luglio, a star colla schiena curva quattordici ore, col soprastante a cavallo dietro, che vi piglia a nerbate se fate di rizzarvi un momento. Per questo non aveva lasciato passare un minuto della sua vita che non fosse impiegato a fare della roba; e adesso i suoi aratri erano numerosi come le lunghe file dei corvi che arrivano in novembre; e altre due file di muli, che non finivano più, portavano le sementi; le donne che stavano accoccolate nel fango, da ottobre a marzo, per raccogliere le sue olive, non si potevano contare, come non si possono contare le gazze che vengono a rubarle; e al tempo della vendemmia accorrevano dei villaggi interi alle sue vigne, e fin dove sentivasi cantare, nella campagna, era per la vendemmia di Mazzarò. Alla mèsse poi i mietitori di Mazzarò sembravano un esercito di soldati, che per mantenere tutta quella gente, col biscotto alla mattina e il pane e l'arancia amara a colazione, e la merenda, e le lasagne alla sera, ci volevano dei denari a manate, e le lasagne si scodellavano nelle madie larghe come tinozze. Perciò adesso, quando andava a cavallo dietro la fila dei suoi mietitori, col nerbo in mano, non ne perdeva d'occhio uno solo, e badava a ripetere: «Curviamoci, ragazzi!». Egli era tutto l'anno colle mani in tasca a spendere, e per la sola fondiaria il re si pigliava tanto che a Mazzarò gli veniva la febbre, ogni volta.</p>
+<p>Però ciascun anno tutti quei magazzini grandi come chiese si riempivano di grano che bisognava scoperchiare il tetto per farcelo capire tutto; e ogni volta che Mazzarò vendeva il vino, ci voleva più di un giorno per contare il denaro, tutto di dodici tarì d'argento, ché lui non ne voleva di carta sudicia per la sua roba, e andava a comprare la carta sudicia soltanto quando aveva da pagare il re, o gli altri; e alle fiere gli armenti di Mazzarò coprivano tutto il campo, e ingombravano le strade, che ci voleva mezza giornata per lasciarli sfilare, e il santo, colla banda, alle volte doveva mutar strada, e cedere il passo.</p>
+<p>Tutta quella roba se l'era fatta lui, colle sue mani e colla sua testa, col non dormire la notte, col prendere la febbre dal batticuore o dalla malaria, coll'affaticarsi dall'alba a sera, e andare in giro, sotto il sole e sotto la pioggia, col logorare i suoi stivali e le sue mule. Egli solo non si logorava, pensando alla sua roba, ch'era tutto quello ch'ei avesse al mondo; perché non aveva né figli, né nipoti, né parenti; non aveva altro che la sua roba. Quando uno è fatto così, vuol dire che è fatto per la roba.</p>
+<p>Ed anche la roba era fatta per lui, che pareva ci avesse la calamita, perché la roba vuol stare con chi sa tenerla, e non la sciupa come quel barone che prima era stato il padrone di Mazzarò, e l'aveva raccolto per carità nudo e crudo ne' suoi campi, ed era stato il padrone di tutti quei prati e di tutti quei boschi, e di tutte quelle vigne e tutti quegli armenti, che quando veniva nelle sue terre a cavallo coi campieri dietro, pareva il re, e gli preparavano anche l'alloggio e il pranzo, al minchione, sicché ognuno sapeva l'ora e il momento in cui doveva arrivare, e non si faceva sorprendere colle mani nel sacco. «Costui vuol esser rubato per forza!» diceva Mazzarò, e schiattava dalle risa quando il barone gli dava dei calci nel di dietro, e si fregava la schiena colle mani, borbottando: «Chi è minchione, se ne stia a casa: la roba non è di chi l'ha, ma di chi la sa fare». Invece egli, dopo che ebbe la sua roba, non mandava certo a dire se veniva a sorvegliare la mèsse, o la vendemmia, e quando, e come; ma capitava all'improvviso, a piedi o a cavallo alla mula, senza campieri, con un pezzo di pane in tasca; e dormiva accanto ai suoi covoni, cogli occhi aperti, e lo schioppo fra le gambe.</p>
+<p>In tal modo, a poco a poco Mazzarò divenne il padrone di tutta la roba del barone; e costui uscì prima dall'uliveto, e poi dalle vigne, e poi dai pascoli, e poi dalle fattorie e infine dal suo palazzo istesso, che non passava giorno che non firmasse delle carte bollate, e Mazzarò ci metteva sotto la sua brava croce. Al barone non rimase altro che lo scudo di pietra ch'era prima sul portone, ed era la sola cosa che non avesse voluto vendere, dicendo a Mazzarò: «Questo solo, di tutta la mia roba, non fa per te». Ed era vero; Mazzarò non sapeva che farsene, e non l'avrebbe pagato due baiocchi. Il barone gli dava ancora del tu, ma non gli dava più calci nel di dietro.</p>
+<p>«Questa è una bella cosa, d'avere la fortuna che ha Mazzarò!» diceva la gente; e non sapeva quel che ci era voluto ad acchiappare quella fortuna: quanti pensieri, quante fatiche, quante menzogne, quanti pericoli di andare in galera, e come quella testa che era un brillante avesse lavorato giorno e notte, meglio di una màcina da mulino, per fare la roba; e se il proprietario di una chiusa limitrofa si ostinava a non cedergliela, e voleva prendere pel collo Mazzarò, dover trovare uno stratagemma per costringerlo a vendere, e farcelo cascare, malgrado la diffidenza contadinesca. Ei gli andava a vantare, per esempio, la fertilità di una tenuta la quale non produceva nemmeno lupini, e arrivava a fargliela credere una terra promessa, sicché il povero diavolo si lasciava indurre a prenderla in affitto, per specularci sopra, e ci perdeva il fitto, la casa e la chiusa, che Mazzarò se l'acchiappava per un pezzo di pane.</p>
+<p>E quante seccature Mazzarò doveva sopportare! I mezzadri che venivano a lagnarsi delle malannate, i debitori che mandavano in processione le loro donne a strapparsi i capelli e picchiarsi il petto per scongiurarlo di non metterli in mezzo alla strada, col pigliarsi il mulo o l'asinello, che non avevano da mangiare. «Lo vedete quel che mangio io?» rispondeva lui, «pane e cipolla! e sì che ho i magazzini zeppi, e sono il padrone di tutta questa roba». E se gli domandavano un pugno di fave, di tutta quella roba, ei diceva: «Che, vi pare che l'abbia rubata? Non sapete quanto costano per seminarle, e zapparle, e raccoglierle?». E se gli domandavano un soldo rispondeva che non l'aveva.</p>
+<p>E non l'aveva davvero. Ché in tasca non teneva mai dodici tarì, tanti ce ne volevano per far fruttare tutta quella roba, e il denaro entrava e usciva come un fiume dalla sua casa. Del resto a lui non gliene importava del denaro; diceva che non era roba, e appena metteva insieme una certa somma, comprava subito un pezzo di terra; perché voleva arrivare ad avere della terra quanta ne ha il re, ed esser meglio del re, ché il re non può né venderla, né dire ch'è sua.</p>
+<p>Di una cosa sola gli doleva, che cominciasse a farsi vecchio, e la terra doveva lasciarla là dov'era. Questa è un'ingiustizia di Dio, che dopo essersi logorata la vita ad acquistare della roba, quando arrivate ad averla, che ne vorreste ancora, dovete lasciarla! E stava delle ore seduto sul corbello, col mento nelle mani, a guardare le sue vigne che gli verdeggiavano sotto gli occhi, e i campi che ondeggiavano di spighe come un mare, e gli oliveti che velavano la montagna come una nebbia, e se un ragazzo seminudo gli passava dinanzi, curvo sotto il peso come un asino stanco, gli lanciava il suo bastone fra le gambe, per invidia, e borbottava: «Guardate chi ha i giorni lunghi! costui che non ha niente!».</p>
+<p>Sicché quando gli dissero che era tempo di lasciare la sua roba, per pensare all'anima, uscì nel cortile come un pazzo, barcollando, e andava ammazzando a colpi di bastone le sue anitre e i suoi tacchini e strillava: «Roba mia, vientene con me!».</p>
+                    </div>
+                </div>
+
+                <!-- TESTO INTEGRALE MASTRO-DON GESUALDO -->
+                <div class="tab-pane fade" id="gesualdo-full">
+                    <div class="alert alert-success border-0 shadow-sm mb-3">
+                        <i class="fas fa-check-circle me-2"></i><strong>Testo Integrale Antologico (T7):</strong> Mastro-don Gesualdo, Parte IV, Cap. 4 (L'addio alla roba).
+                    </div>
+                    <div class="text-box">
+                        <p>Non voleva veder nessuno. Giacché era condannato, voleva morire in pace, senza operazioni chirurgiche, lontano dai guai, nella sua campagna. S'attaccava alla vita mani e piedi, disperato. Ne aveva passate delle altre; s'era aiutato sempre da sé, nei mali passi. Coraggio ne aveva, e aveva il cuoio duro anche. Mangiava e beveva; si ostinava a star meglio; si alzava dal letto due o tre ore al giorno; si trascinava per le stanze, da un mobile all'altro. Infine si fece portare a Mangalavite, col fiato ai denti, mastro Nardo da un lato e Masi dall'altro che lo reggevano sul mulo un viaggio che durò tre ore, e gli fece dire cento volte: «Buttatemi nel fosso, ch'è meglio».</p>
+<p>Ma laggiù, dinanzi alla sua roba, si persuase che era finita davvero, che ogni speranza per lui era perduta, al vedere che di nulla gliene importava, oramai. La vigna metteva già le foglie, i seminati erano alti, gli ulivi in fiore, i sommacchi verdi, e su ogni cosa stendevasi una nebbia, una tristezza, un velo nero. La stessa casina, colle finestre chiuse, la terrazza dove Bianca e la figliuola solevano mettersi a lavorare, il viale deserto, fin la sua gente di campagna che temeva di seccarlo e se ne stava alla larga, lì nel cortile o sotto la tettoia, ogni cosa gli stringeva il cuore; ogni cosa gli diceva: Che fai? che vuoi? La sua stessa roba lì, i piccioni che roteavano a stormi sul suo capo, le oche e i tacchini che schiamazzavano dinanzi a lui... Si udivano delle voci e delle cantilene di villani che lavoravano. Per la viottola di Licodia, in fondo, passava della gente a piedi e a cavallo. Il mondo andava ancora pel suo verso, mentre non c'era più speranza per lui, roso dal baco al pari di una mela fradicia che deve cascare dal ramo, senza forza di muovere un passo sulla terra, senza voglia di mandar giù un uovo. Allora disperato di dover morire, si mise a bastonare anatre e tacchini, a strappar gemme e sementi. Avrebbe voluto distruggere d'un colpo tutto quel ben di Dio che aveva accumulato a poco a poco. Voleva che la sua roba se ne andasse con lui, disperata come lui. Mastro Nardo e il garzone dovettero portarlo di nuovo in paese, più morto che vivo.</p>
+<p>Di lì a qualche giorno arrivò il duca di Leyra, chiamato per espresso, e s'impadronì del suocero e della casa, dicendo che voleva condurselo a Palermo e farlo curare dai migliori medici. Il poveretto, ch'era ormai l'ombra di se stesso, lasciava fare; riapriva anzi il cuore alla speranza; intenerivasi alle premure del genero e della figliuola che l'aspettava a braccia aperte. Gli pareva che gli tornassero già le forces. Non vedeva l'ora d'andarsene, quasi dovesse lasciare il suo male lì, in quella casa e in quei poderi che gli erano costati tanti sudori, e che gli pesavano invece adesso sulle spalle. Il genero intanto occupavasi col suo procuratore a mettere in sesto gli affari. Appena don Gesualdo fu in istato di poter viaggiare, lo misero in lettiga e partirono per la città. Era una giornata piovosa. Le case note, dei visi di conoscenti che si voltavano appena, sfilavano attraverso gli sportelli della lettiga. Speranza, e tutti i suoi, in collera dacché era venuto il duca a spadroneggiare, non si erano fatti più vedere. Ma Nardo aveva voluto accompagnare il padrone sino alle ultime case del paese. In via della Masera si udì gridare: «Fermate! fermate!» e apparve Diodata che voleva salutare don Gesualdo l'ultima volta, lì, davanti il suo uscio. Però, giunta vicino a lui, non seppe trovare le parole, e rimaneva colle mani allo sportello, accennando col capo.</p>
+<p>«Ah, Diodata... Sei venuta a darmi il buon viaggio?...» disse lui. Essa fece segno di sì, di sì, cercando di sorridere, e gli occhi le si riempirono di lagrime.</p>
+<p>«Povera Diodata! Tu sola ti rammenti del tuo padrone...».</p>
+<p>Affacciò il capo allo sportello, cercando forse degli altri, ma siccome pioveva lo tirò indietro subito.</p>
+<p>«Guarda che fai!... sotto la pioggia... a capo scoperto!... È il tuo vizio antico! Ti rammenti, eh, ti rammenti?»</p>
+<p>«Sissignore» rispose lei semplicemente, e continuava ad accompagnare le parole coi cenni del capo. «Sissignore, fate buon viaggio, vossignoria».</p>
+<p>Si staccò pian piano dalla lettiga, quasi a malincuore, e tornò a casa, fermandosi sull'uscio, umile e triste.</p>
+                    </div>
+                </div>
+
+                <!-- SINTESI COMPARATIVA -->
+                <div class="tab-pane fade" id="sintesi">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 border rounded bg-light h-100">
+                                <h4 class="text-amber fw-bold mb-3"><i class="fas fa-wheat-awn me-2"></i>La roba (Mazzarò)</h4>
+                                <p><b>1. L'Eroico 'Mito della Roba':</b> Mazzarò è un ex bracciante che, con un'ossessione titanica, sacrifici disumani e una testa 'ch'era un brillante', accumula terreni fin dove arriva la vista.</p><p><b>2. La Logica del Profitto e l'Avarizia:</b> Nonostante l'immensa ricchezza, Mazzarò vive poverissimo: mangia due soldi di pane, indossa abiti di poco valore e rifiuta ogni vizio o affetto umano.</p><p><b>3. L'Inconsistenza della Ricchezza di Fronte alla Morte:</b> Con l'avanzare della vecchiaia, emerge il dramma: la terra rimane lì dove si trova, incapace di seguire il suo proprietario nell'oltretomba.</p><p><b>4. Il Gesto Disperato e Tragico:</b> Alla fine, pazzo di disperazione all'idea di doversi separare dalla sua 'roba', esce nel cortile bastonando i suoi animali e urlando: 'Roba mia, vientene con me!'.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 border rounded bg-light h-100">
+                                <h4 class="text-amber fw-bold mb-3"><i class="fas fa-user-slash me-2"></i>Mastro-don Gesualdo</h4>
+                                <p><b>1. L'Ascesa Sociale e le Contraddizioni (Mastro e Don):</b> Gesualdo Motta sale i gradini della scala sociale da muratore a ricco proprietario sposando la nobile Bianca Trao, ma rimane un reietto sia per i poveri che per i nobili.</p><p><b>2. La Sconfitta Affettiva e la Solitudine:</b> La ricchezza gli aliena tutti gli affetti: la famiglia d'origine è invidiosa, la moglie gli è estranea, la figlia Isabella lo rifiuta e il genero (il duca di Leyra) pensa solo al patrimonio.</p><p><b>3. Il Congedo Dalla 'Roba' (Mangalavite):</b> Consapevole di morire di cancro, si fa portare nei suoi possedimenti, ma la vista della campagna fiorente gli stringe il cuore. Tenta disperatamente di distruggere animali e piante.</p><p><b>4. L'Addio Umano e la Fine da 'Vinto':</b> Saluta con malinconia la fedele serva Diodata, l'unica ad avergli voluto bene, e viene portato a Palermo dove morirà solo e incompreso, perfetto simbolo dei 'Vinti'.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. FLASHCARDS E CONCETTI CHIAVE -->
+        <section id="flashcards-section" class="section-card">
+            <h2 class="text-warning mb-4"><i class="fas fa-layer-group me-2"></i>Flashcards & Concetti Chiave</h2>
+            <p class="text-muted mb-4">Clicca sulle carte per esplorare le categorie di analisi verghiana e le differenze tra i due capolavori!</p>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                            <div class="flashcard-front">Il Mito della Roba</div>
+                            <div class="flashcard-back">L'accumulazione di beni materiali intesa come unico scopo di vita e forma di riscatto sociale, che finisce però per schiacciare l'uomo.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                            <div class="flashcard-front">Mastro + Don</div>
+                            <div class="flashcard-back">La contraddizione del titolo: 'Mastro' indica le umili origini da muratore, 'Don' il titolo nobiliare/borghese acquisito. Un'unione che rivela la sua estraniazione sociale.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                            <div class="flashcard-front">Il Narratore Popolare vs Borghese</div>
+                            <div class="flashcard-back">In 'La roba' il narratore regredisce al livello popolare (straniamento); nel 'Gesualdo' il narratore è di estrazione borghese e fa uso del discorso indiretto libero.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                            <div class="flashcard-front">Sconfitta Economica vs Sconfitta Umana</div>
+                            <div class="flashcard-back">Mazzarò e Gesualdo sono vincitori sul piano materiale della ricchezza, ma completi 'Vinti' sul piano esistenziale, affettivo e biologico.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                            <div class="flashcard-front">L'Addio a Diodata</div>
+                            <div class="flashcard-back">Il momento di mesta malinconia in cui Gesualdo comprende di aver sacrificato l'unico vero affetto sincero e disinteressato per l'illusione della scalata sociale.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                            <div class="flashcard-front">Il Gesto della Distruzione</div>
+                            <div class="flashcard-back">L'atto disperato e furioso di bastonare gli animali e strappare le gemme: il rifiuto tragico di accettare che la 'roba' sopravviva al proprio proprietario.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. MAPPA MULTI-NODO INTERATTIVA -->
+        <section id="nodo-interattivo" class="node-container mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="node-badge" id="node-step-tag">Nodo 1 d'Inizio</span>
+                <button class="btn btn-sm btn-outline-light" onclick="restartNodes()"><i class="fas fa-redo me-1"></i>Ricomincia il Percorso</button>
+            </div>
+
+            <h3 id="node-title" class="text-warning mb-3">1. L'Ascesa Economica: La Logica della 'Roba'</h3>
+
+            <div id="node-history" class="mb-3"></div>
+
+            <div class="p-3 bg-dark bg-opacity-50 rounded border border-secondary mb-4 fs-6" id="node-body">
+                Sia Mazzarò che Gesualdo nascono poveri e, grazie ad una tenacia disumana, alla capacità di sacrificio e all'intelligenza negli affari, accumulano immenso patrimonio agricolo.
+            </div>
+
+            <!-- Quiz / Spunto di dibattito -->
+            <div id="node-quiz-container" class="bg-black bg-opacity-30 p-3 rounded mb-4 border-start border-3 border-warning">
+                <h6 class="text-warning mb-2"><i class="fas fa-brain me-2"></i>Spunto di Analisi e Dibattito in Classe:</h6>
+                <p id="node-quiz-text" class="small mb-0">Qual è la differenza fondamentale nel riscatto sociale cercato da Mazzarò e quello cercato da Gesualdo?</p>
+            </div>
+
+            <!-- Scelte e Piste di navigazione -->
+            <h5 class="text-warning mb-3"><i class="fas fa-compass me-2"></i>Scegli quale pista o approfondimento esplorare:</h5>
+            <div id="node-choices">
+                <!-- Generato via JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5 border-top border-warning">
+        <div class="container">
+            <p class="mb-1">Laboratorio Didattico Multimediale - Italiano (5ª ITE / Liceo)</p>
+            <small class="text-muted">Giovanni Verga - La Roba & Mastro-don Gesualdo | Piattaforma Multi-Nodo</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script Mappa Multi-Nodo -->
+    <script>
+        const graphNodes = {
+            n1: {
+                step: "Nodo 1",
+                title: "1. L'Ascesa Economica: La Logica della 'Roba'",
+                text: "Mazzarò accumula ricchezze senza cambiare il suo stile di vita (resta vestito da povero e mangia pane e cipolla). Gesualdo, invece, tenta il salto di qualità sociale imparentandosi con i nobili Trao.",
+                quiz: "Mazzarò cerca il possesso puro ('la roba per la roba'), mentre Gesualdo cerca anche il riconoscimento sociale ed aristocratico attraverso il matrimonio.",
+                choices: [
+                    { text: "Prosegui verso La Sconfitta degli Affetti Familiali", target: "n2" },
+                    { text: "Focus Critico: Le differenti tecniche narrative nei due testi", target: "n1_deep" }
+                ]
+            },
+            n1_deep: {
+                step: "Approfondimento Nodo 1",
+                title: "Focus Critico: La Tecnica Narrativa",
+                text: "In 'La roba', Verga usa il narratore popolare e la tecnica dello 'straniamento rovesciato' (l'avidità di Mazzarò viene celebrata come una virtù). Nel 'Mastro-don Gesualdo', scompare la coralità popolare e prevale il discorso indiretto libero del protagonista.",
+                quiz: "Come cambia il punto di vista del lettore quando la voce narrante passa dal popolo a un narratore di estrazione borghese?",
+                choices: [
+                    { text: "Torna al percorso principale: vai alla Sconfitta degli Affetti", target: "n2" }
+                ]
+            },
+            n2: {
+                step: "Nodo 2",
+                title: "2. La Sconfitta Affettiva: Solitudine e Alienazione",
+                text: "Mazzarò non ha mai avuto affetti ('non aveva altro che la sua roba'). Gesualdo tenta di creare relazioni, ma il denaro gli aliena il padre, i fratelli, la moglie Bianca e la figlia Isabella.",
+                quiz: "Mentre Mazzarò sceglie la solitudine fin dall'inizio, Gesualdo subisce l'isolamento come una tragica condanna interiore.",
+                choices: [
+                    { text: "Avanza verso L'Addio alla Roba (Il Congedo dai Campi)", target: "n3" },
+                    { text: "Focus Personaggi: La figura di Diodata rispetto a Bianca Trao", target: "n2_diodata" }
+                ]
+            },
+            n2_diodata: {
+                step: "Focus Personaggi",
+                title: "Focus: Diodata e il Rimpianto degli Affetti Autentici",
+                text: "Diodata rappresenta l'amore sincero e sottomesso che Gesualdo rifiuta per sposare la nobile Bianca Trao. Al momento del congedo finale, Diodata è l'unica figura che dimostra un dolore reale ed umano.",
+                quiz: "Gesualdo definisce il suo matrimonio con Bianca 'un affare sbagliato'. In che misura Verga critica il sacrificio dei sentimenti in nome del profitto?",
+                choices: [
+                    { text: "Prosegui verso L'Addio alla Roba a Mangalavite", target: "n3" },
+                    { text: "Ritorna alla Sconfitta Affettiva", target: "n2" }
+                ]
+            },
+            n3: {
+                step: "Nodo 3",
+                title: "3. L'Addio alla Roba e la Furia della Morte",
+                text: "Di fronte alla morte imminente, sia Mazzarò che Gesualdo provano rabbia e disperazione nel vedere che la natura e la campagna continuano a fiorire indisturbate mentre loro stanno per morire.",
+                quiz: "I due protagonisti reagiscono con lo stesso gesto simbolico: bastonare le anatre e i tacchini e distruggere i propri beni.",
+                choices: [
+                    { text: "Avanza verso L'Epilogo dei 'Vinti'", target: "n4" },
+                    { text: "Analisi Simbolica: La malattia come somatizzazione del cancro della 'Roba'", target: "n3_malattia" }
+                ]
+            },
+            n3_malattia: {
+                step: "Focus Simbolico",
+                title: "Focus: La Malattia di Gesualdo",
+                text: "Gesualdo muore per un cancro allo stomaco. La critica (Pilato-Mesiano) individua nella malattia la somatizzazione di tutta la fatica, l'alienazione e l'amarezza accumulate durante la sua vita da arrampicatore sociale.",
+                quiz: "In che modo la malattia fisica diventa la metafora definitiva del fallimento dell'ascesa sociale verghiana?",
+                choices: [
+                    { text: "Prosegui verso L'Epilogo dei 'Vinti'", target: "n4" }
+                ]
+            },
+            n4: {
+                step: "Nodo Finale",
+                title: "4. L'Epilogo Tragico: Il Pessimismo Verghiano",
+                text: "Il Ciclo dei Vinti dimostra l'impossibilità per l'individuo di progredire e cambiare stato senza essere travolto dalle leggi ineludibili della natura e della società. Gesualdo muore a Palermo, tra la totale indifferenza dei servi del duca.",
+                quiz: "Confronto finale: Sia Mazzarò che Gesualdo dimostrano che la 'roba' dona un'illusione di potenza temporanea, ma trasforma l'uomo in un definitivo 'vinto' sul piano umano.",
+                choices: [
+                    { text: "Riesamina l'intero Percorso Comparativo dall'inizio", target: "n1" }
+                ]
+            }
+        };
+
+        let currentNodeKey = "n1";
+        let historyArray = [];
+
+        function renderNode(key) {
+            const node = graphNodes[key];
+            if (!node) return;
+
+            currentNodeKey = key;
+            if (!historyArray.includes(node.step)) {
+                historyArray.push(node.step);
+            }
+
+            document.getElementById("node-step-tag").innerText = node.step;
+            document.getElementById("node-title").innerText = node.title;
+            document.getElementById("node-body").innerText = node.text;
+            document.getElementById("node-quiz-text").innerText = node.quiz;
+
+            // Render Storico
+            const historyContainer = document.getElementById("node-history");
+            historyContainer.innerHTML = "<small class='text-muted me-2'>Percorso esplorato:</small>" + 
+                historyArray.map(h => `<span class="node-history-badge">${h}</span>`).join(" <i class='fas fa-chevron-right text-muted' style='font-size: 0.7rem;'></i> ");
+
+            // Render Scelte
+            const choicesContainer = document.getElementById("node-choices");
+            choicesContainer.innerHTML = "";
+
+            node.choices.forEach(c => {
+                const btn = document.createElement("button");
+                btn.className = "btn-node";
+                btn.innerHTML = `<i class="fas fa-arrow-right me-2 text-warning"></i>${c.text}`;
+                btn.onclick = () => renderNode(c.target);
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        function restartNodes() {
+            historyArray = [];
+            renderNode("n1");
+        }
+
+        window.onload = function() {
+            renderNode("n1");
+        };
+    </script>
+</body>
+</html>
